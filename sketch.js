@@ -1,37 +1,48 @@
 // rainbow algorithm taken from: https://krazydad.com/tutorials/makecolors.php
 
-let font, vehicles;
-const text = 'rainbow';
+let font, bounds;
+let vehicles = [];
+const fontSize = 200;
 
 function preload() {
-  font = loadFont('rainbow.ttf');
+  font = loadFont('Bubblegum.ttf');
 }
 
 function setup() {
   let cnv = createCanvas(windowWidth, windowHeight);
   cnv.style('display', 'block');
-  let { x, y, w, h } = getCenterCoords(font, 'rainbow', 300);
-  let points = font.textToPoints('rainbow', x, y, 300, {
-    sampleFactor: 0.1,
-    simplifyThreshold: 0
-  });
-  let rainbow = makeRainbow(points.length);
-  for (let i = 0; i < points.length; i++) {
-    let p = points[i];
-    let col = rainbow[i];
-    vehicles.push(new Vehicle(p.x, p.y, col));
+  let { text } = getURLParams();
+  if (!text) {
+    text = prompt('Enter text (< 10 chars)', 'rainbow');
+    window.location.replace(getURL() + '?text=' + text);
+  } else {
+    bounds = getCenterCoords(font, text, fontSize);
+    let { x, y, w, h } = bounds;
+    let points = font.textToPoints(text, x, y, fontSize, {
+      sampleFactor: 0.1,
+      simplifyThreshold: 0
+    });
+    let rainbow = makeRainbow(points.length);
+    for (let i = 0; i < points.length; i++) {
+      let p = points[i];
+      let col = rainbow[i];
+      vehicles.push(new Vehicle(p.x, p.y, col));
+    }
   }
 }
 
 function draw() {
-  background(51);
+  background(255);
   for (const v of vehicles) {
-    vehicles.update();
-    vehicles.show();
+    let mouse = createVector(mouseX, mouseY);
+    v.steer(mouse);
+    v.update();
+    v.show();
   }
-  stroke(245);
-  noFill();
-  rect(x, y - h, w, h);
+  // stroke(230);
+  // noFill();
+  // let { x, y, w, h } = bounds;
+  // rect(x, y - h, w, h);
 }
 
 function getCenterCoords(glyph, textContent, size) {
@@ -48,7 +59,7 @@ function makeRainbow(len) {
   const shift = 128;
   const amp = 127;
   const frequency = TWO_PI / len;
-  const phase = 0;
+  const phase = PI;
   const colors = [];
   let r, g, b;
   for (let i = 0; i < len; ++i) {
