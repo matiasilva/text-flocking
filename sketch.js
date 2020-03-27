@@ -11,23 +11,18 @@ function preload() {
 function setup() {
   let cnv = createCanvas(windowWidth, windowHeight);
   cnv.style('display', 'block');
-  let { text } = getURLParams();
-  if (!text) {
-    text = prompt('Enter text (< 10 chars)', 'rainbow');
-    window.location.replace(getURL() + '?text=' + text);
-  } else {
-    bounds = getCenterCoords(font, text, fontSize);
-    let { x, y, w, h } = bounds;
-    let points = font.textToPoints(text, x, y, fontSize, {
-      sampleFactor: 0.1,
-      simplifyThreshold: 0
-    });
-    let rainbow = makeRainbow(points.length);
-    for (let i = 0; i < points.length; i++) {
-      let p = points[i];
-      let col = rainbow[i];
-      vehicles.push(new Vehicle(p.x, p.y, col));
-    }
+  text = prompt('Enter text (< 10 chars)', 'rainbow');
+  bounds = getCenterCoords(font, text, fontSize);
+  let { x, y, w, h } = bounds;
+  let points = font.textToPoints(text, x, y, fontSize, {
+    sampleFactor: 0.1,
+    simplifyThreshold: 0
+  });
+  let rainbow = makeRainbow(points.length);
+  for (let i = 0; i < points.length; i++) {
+    let p = points[i];
+    let col = rainbow[i];
+    vehicles.push(new Vehicle(p.x, p.y, col));
   }
 }
 
@@ -59,13 +54,13 @@ function makeRainbow(len) {
   const shift = 128;
   const amp = 127;
   const frequency = TWO_PI / len;
-  const phase = PI;
+  const phase = PI / 2;
   const colors = [];
   let r, g, b;
   for (let i = 0; i < len; ++i) {
-    r = sin(frequency * i + TWO_PI / 3 + phase) * amp + shift;
-    g = sin(frequency * i + 0 + phase) * amp + shift;
-    b = sin(frequency * i + (2 * TWO_PI) / 3 + phase) * amp + shift;
+    r = sin(frequency * i + 0 + phase) * amp + shift;
+    g = sin(frequency * i + (2 * PI) / 3 + phase) * amp + shift;
+    b = sin(frequency * i + (4 * PI) / 3 + phase) * amp + shift;
     colors.push({ r, g, b });
   }
   return colors;
